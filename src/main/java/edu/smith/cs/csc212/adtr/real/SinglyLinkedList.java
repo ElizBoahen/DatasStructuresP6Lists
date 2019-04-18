@@ -138,11 +138,17 @@ public class SinglyLinkedList<T> extends ListADT<T> {
 		throw new BadIndexError(index);
 	}
 	
-
 	@Override
 	public void setIndex(int index, T value) {
 		checkNotEmpty();
-		throw new TODOErr();
+		int at = 0;
+		for (Node<T> n = this.start; n != null; n = n.next) {
+			if (at++ == index) {
+				n.value = value;
+				return;
+			}
+		}
+		throw new BadIndexError(index);
 	}
 
 	@Override
