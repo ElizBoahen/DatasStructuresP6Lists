@@ -2,6 +2,7 @@ package edu.smith.cs.csc212.adtr.real;
 
 import edu.smith.cs.csc212.adtr.ListADT;
 import edu.smith.cs.csc212.adtr.errors.BadIndexError;
+import edu.smith.cs.csc212.adtr.errors.EmptyListError;
 import edu.smith.cs.csc212.adtr.errors.TODOErr;
 
 public class SinglyLinkedList<T> extends ListADT<T> {
@@ -14,32 +15,101 @@ public class SinglyLinkedList<T> extends ListADT<T> {
 	@Override
 	public T removeFront() {
 		checkNotEmpty();
-		throw new TODOErr();
+		T before = start.value;
+		start = start.next;
+		return before;
 	}
 
 	@Override
 	public T removeBack() {
-		throw new TODOErr();
+		Node<T> current = start;
+		checkNotEmpty();
+		// if there is only one item
+		if (start.next == null) {
+			T last = start.value;
+			start = null; // Not start.next bc start.next IS A NODE so make start = to null and it'll forget start.next
+			return last;
+		}
+		while (current.next != null) {
+			if (current.next.next == null) {
+				T last = current.next.value;
+				current.next = null;
+				return last;
+			} else {
+				current = current.next;
+			}
+		}
+		throw new EmptyListError();
 	}
 
 	@Override
 	public T removeIndex(int index) {
-		throw new TODOErr();
+		checkNotEmpty();
+		if (index == 0) {
+			return removeFront();
+		}
+		if (index == size()-1) {
+			return removeBack();
+		}
+		else {
+			Node<T> behind = start;
+			for (int i = 0; i < index-1; i++) {
+				behind = behind.next;
+			}
+			Node <T> trash = behind.next; // Creates anew node that points at the node being removed
+			behind.next = behind.next.next; // Skip over the node we're deleting
+			trash.next = null; // Makes the node we're deleting point to nothings
+			return trash.value;
+		}
 	}
 
 	@Override
 	public void addFront(T item) {
-		this.start = new Node<T>(item, start);
+		if (start == null) {
+			start = new Node<T>(item, null);
+		}
+		else {
+			start = new Node<T>(item, start); //B/c the start on the right hand side of the equals is the old start value
+		}
 	}
 
 	@Override
 	public void addBack(T item) {
-		throw new TODOErr();
+		//if there are no nodes in list
+		if (start == null) {
+			this.start = new Node<T>(item, start);
+		}
+		//if there is one node
+		else {
+			Node<T> last = start;
+			while (last.next != null) {
+				last = last.next;
+			}
+			last.next = new Node<T>(item, null);
+		}
 	}
 
 	@Override
 	public void addIndex(int index, T item) {
-		throw new TODOErr();
+		if (index == 0) {
+			addFront(item);
+		}
+		else if (index < 0) {
+			throw new BadIndexError(index);
+		}
+		else if (index == size()) { //We have elseif's because
+			addBack(item);
+		}
+		else if (index > size()) {
+			throw new BadIndexError(index);
+		}
+		else {
+			Node<T> behind = start;
+			for (int i = 0; i < index-1; i++) {
+				behind = behind.next;
+			}
+			behind.next = new Node<T>(item, behind.next);
+		}
 	}
 	
 	
@@ -47,13 +117,13 @@ public class SinglyLinkedList<T> extends ListADT<T> {
 	@Override
 	public T getFront() {
 		checkNotEmpty();
-		throw new TODOErr();
+		return start.value;
 	}
 
 	@Override
 	public T getBack() {
 		checkNotEmpty();
-		throw new TODOErr();
+		return getIndex(size()-1); // because size starts counting from 1 so if we want the last index . . . 
 	}
 
 	@Override
